@@ -2,31 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $users = User::all();
+
         return view('users.index', compact('users'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('users.create');
     }
 
-    public function store(Request $request)
+    public function store(UserRequest $request): RedirectResponse
     {
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-        ]);
-
         User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -37,25 +33,18 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Użytkownik został dodany.');
     }
 
-    public function show(User $user)
+    public function show(User $user): View
     {
         return view('users.show', compact('user'));
     }
 
-    public function edit(User $user)
+    public function edit(User $user): View
     {
         return view('users.edit', compact('user'));
     }
 
-    public function update(Request $request, User $user)
+    public function update(UserRequest $request, User $user): RedirectResponse
     {
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8',
-        ]);
-
         $user->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -66,7 +55,7 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Użytkownik został zaktualizowany.');
     }
 
-    public function destroy(User $user)
+    public function destroy(User $user): RedirectResponse
     {
         $user->delete();
 
